@@ -7,8 +7,6 @@ with open("config.json") as conf:
     
 pin = data.get("pin", "Unknown")
 interval = data.get("interval", "Unknown")
-#print(pin)
-#print(interval)
 
 def pico_id_get():
   pico_id = machine.unique_id()
@@ -30,7 +28,6 @@ if not roms:
     
 while True:
   ds_sensor.convert_temp()
-  time.sleep_ms(interval)
+  time.sleep(interval)
   for rom in roms:
     print(pico_id_get(), temp_id_get(), ds_sensor.read_temp(rom))
-  time.sleep(1)

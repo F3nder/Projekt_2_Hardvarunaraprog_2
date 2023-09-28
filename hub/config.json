@@ -1,0 +1,5 @@
+{
+    "name": "room-428",
+    "broker": "broker.hivemq.com",
+    "topic": "ela/project"
+}
