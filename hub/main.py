@@ -1,49 +1,38 @@
 import paho.mqtt.client as mqtt
 import serial
+import json
 
-# Create a MQTT client and register a callback for connect events
+with open("hub/config.json") as conf:
+    data = json.load(conf) 
+name = data.get("name", "Unknown")
+broker = data.get("broker", "Unknown")
+topic = data.get("topic", "Unknown")
+
 client = mqtt.Client()
-
-# Connect to a broker
-client.connect("broker.hivemq.com", port=1883, keepalive=60)
-
-# Start a background loop that handles all broker communication
+client.connect(broker, port=1883, keepalive=60)
 client.loop_start()
 
-pico_id = 0
-temp_id = 0
-temp = 0
 while True:
     with serial.Serial('COM5', 115200, timeout=1) as ser:
         line = ser.readline()
         if len(line) > 0:
-            # line_decode = line.decode('utf-8')
             line_split = line.split()
-            print(line_split)
             pico_id = bytes(line_split[0])
             temp_id = bytes(line_split[1])
             temp = bytes(line_split[2])
+            
+            pico_id_decode = pico_id.decode('utf-8')
+            temp_id_decode = temp_id.decode('utf-8')
 
-            for byte in pico_id:
-                print(byte, end=" ")
-            print("\n")
+            temp_decode = temp.decode('utf-8')
+            temp_decode_float = float(temp_decode)
+            temp_decode_float = temp_decode_float * 1000
+            
+            long_topic = f"{topic}/{name}/{pico_id_decode}/{temp_id_decode}"
 
-            for byte2 in temp_id:
-                print(byte2, end=" ")
-            print("\n")
+            msg = client.publish(long_topic, payload=temp_decode_float, qos=1)
+            msg.wait_for_publish()
 
-            for byte3 in temp:
-                print(byte3, end=" ")
-            print("\n")
-
-    
-# Send the message
-    msg = client.publish("yrgo/ela/chat2", payload=temp, qos=1)
-    if len(temp) == 0:
-        break
-# If python exits immediately it does not have the time to send
-# the message
-    msg.wait_for_publish()
-
-client.disconnect()
-ser.close()
+    # if input() == 0:
+    #     client.disconnect()
+    #     ser.close()
