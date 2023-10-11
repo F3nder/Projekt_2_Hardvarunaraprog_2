@@ -18,10 +18,10 @@ client = mqtt.Client()
 client.connect(broker, port=1883, keepalive=60)
 client.loop_start()
 
-# Continuously read data from a serial port and publish it to MQTT
-while True:
-    # Establish a serial connection to the specified port with a baud rate of 115200
-    with serial.Serial('COM5', 115200, timeout=1) as ser:
+# Establish a serial connection to the specified port with a baud rate of 115200
+with serial.Serial('COM5', 115200, timeout=1) as ser:
+    while True:
+        
         line = ser.readline()
         timestamp = time.time()
         timestamp_int = int(timestamp)
@@ -39,10 +39,10 @@ while True:
             
             # Converts temp
             temp_float = float(temp_decode)
-            temp_round = int(temp_float * 1000)
+            temp_int = int(temp_float * 1000)
 
              # Pack the timestamp and temperature data into a binary payload
-            payload_ = struct.pack('>Ii', timestamp_int, temp_round)
+            payload_ = struct.pack('>Ii', timestamp_int, temp_int)
 
              # Construct the MQTT topic based on configuration and received data
             long_topic = f"{topic}/{name}/{pico_id_decode}/{temp_id_decode}"

@@ -1,4 +1,4 @@
-#main.py
+#same as main.py but used for debugging on the pico.
 import machine, onewire, ds18x20, time, ujson
 
 # Read the configuration from the "config.json" file
